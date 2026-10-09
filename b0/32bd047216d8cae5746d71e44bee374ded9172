@@ -1,0 +1,69 @@
+.claude-plugin/marketplace.json
+  s_0ddc1002883fa5::t_faa70697a34f5a 1-25
+.gitignore
+  s_0ddc1002883fa5::t_5323022f71ea29 1-2
+changed-files/.claude-plugin/plugin.json
+  s_0ddc1002883fa5::t_756ab996a0220b 1-10
+changed-files/hooks/hooks.json
+  s_0ddc1002883fa5::t_cd0fa3c0768638 1
+changed-files/hooks/register.tsx
+  s_0ddc1002883fa5::t_2957a8131c3de5 1-115
+changed-files/tests/changed-files.test.ts
+  s_0ddc1002883fa5::t_3f1e976f9ed252 1-55
+changed-files/types/index.d.ts
+  s_0ddc1002883fa5::t_98f11bf7fe4199 1-7
+context-pet/.claude-plugin/plugin.json
+  s_0ddc1002883fa5::t_9b10d8ea44aa30 1-10
+context-pet/hooks/hooks.json
+  s_0ddc1002883fa5::t_5290699cdd99ee 1
+context-pet/hooks/pet.ts
+  s_0ddc1002883fa5::t_bf86192d2d46ab 1-57
+context-pet/hooks/register.tsx
+  s_0ddc1002883fa5::t_66c333065e17ed 1-114
+context-pet/tests/context-pet.test.ts
+  s_0ddc1002883fa5::t_cc7e4ee27c9474 1-115
+context-pet/types/index.d.ts
+  s_0ddc1002883fa5::t_4faaf5c2173305 1-7
+turn-notify/.claude-plugin/plugin.json
+  s_0ddc1002883fa5::t_a8885f43a7117a 1-9
+turn-notify/hooks/hooks.json
+  s_0ddc1002883fa5::t_df8e48427abd54 1
+turn-notify/hooks/notify.ts
+  s_0ddc1002883fa5::t_6c15227380cf0a 1-34
+turn-notify/hooks/register.tsx
+  s_0ddc1002883fa5::t_9f834d0d4768dd 1-16
+turn-notify/tests/turn-notify.test.ts
+  s_0ddc1002883fa5::t_06397ed9821e26 1-35
+usage-meter/.claude-plugin/plugin.json
+  s_0ddc1002883fa5::t_6de0e090afade1 1-10
+usage-meter/hooks/hooks.json
+  s_0ddc1002883fa5::t_d9ea6a0692863f 1
+usage-meter/tests/usage-meter.test.ts
+  s_0ddc1002883fa5::t_60274b261e5200 1-53
+usage-meter/types/index.d.ts
+  s_0ddc1002883fa5::t_2246af10ea4c32 1-7
+README.md
+  s_0ddc1002883fa5::t_6ba7b853c536df 1-158
+changed-files/hooks/files.ts
+  s_0ddc1002883fa5::t_18184d38e0603c 1-30
+usage-meter/hooks/meter.ts
+  s_0ddc1002883fa5::t_628ff862989902 1-36
+usage-meter/hooks/register.tsx
+  s_0ddc1002883fa5::t_cf0e7e5a914e93 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b032bd047216d8cae5746d71e44bee374ded9172",
+  "prompts": {},
+  "sessions": {
+    "s_0ddc1002883fa5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e32485e9-0290-467d-bde3-ffbd54e3e535",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Renaud Lavoisier <195878760+RenaudLavoisier@users.noreply.github.com>"
+    }
+  }
+}
