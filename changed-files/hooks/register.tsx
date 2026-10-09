@@ -1,8 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, Timer } from 'claude-code'
 
-import { BINARY, UNCOUNTED, changesOf, countLines, parseNumstat, parseStatus, relativeTo } from './files'
-import type { Count } from './files'
+import { changesOf, parseNumstat, parseStatus, relativeTo } from './files'
 import type { FileChange, Snapshot } from '../types'
 
 const PANE = 'changed-files'
@@ -17,8 +16,6 @@ const hasOpened = atom({ plugin: 'changed-files', key: 'hasOpened' } as const, f
 
 // The empty tree: the base of a repository with no commit yet.
 const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
-// Untracked files whose lines are counted; the ones past it are listed uncounted.
-const MAX_COUNTED = 100
 
 // --no-optional-locks: a read from the timer never takes index.lock from the person's own git.
 async function git($: EngineInterface, cwd: string, args: string[]): Promise<string | null> {
@@ -27,16 +24,7 @@ async function git($: EngineInterface, cwd: string, args: string[]): Promise<str
   return ran.exitCode === 0 ? ran.stdout : null
 }
 
-async function countFile($: EngineInterface, path: string): Promise<Count> {
-  // Rejects when the file is gone or over 4 MiB.
-  const text = await $.fs.read(path).catch(() => null)
-  if (text === null) return UNCOUNTED
-  if (text.includes('\0')) return BINARY
-
-  return { added: countLines(text), removed: 0, isBinary: false }
-}
-
-// What `git diff HEAD` and `git status` say changed in the repository that holds cwd.
+// What `git diff HEAD` and `git status` say changed in the repository that holds cwd, untracked files left out.
 async function snapshot($: EngineInterface, cwd: string): Promise<Snapshot> {
   const top = await git($, cwd, ['rev-parse', '--show-toplevel'])
   if (top === null) return { isRepo: false, files: [] }
@@ -45,18 +33,11 @@ async function snapshot($: EngineInterface, cwd: string): Promise<Snapshot> {
   const head = await git($, root, ['rev-parse', '--verify', '--quiet', 'HEAD'])
   const [diff, status] = await Promise.all([
     git($, root, ['diff', head === null ? EMPTY_TREE : 'HEAD', '--numstat', '-z', '--no-renames']),
-    git($, root, ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--no-renames']),
+    git($, root, ['status', '--porcelain=v1', '-z', '--untracked-files=no', '--no-renames']),
   ])
   if (diff === null || status === null) throw new Error(`git diff or git status failed in ${root}`)
 
-  const codes = parseStatus(status)
-  const fresh = [...codes].filter(([, code]) => code === '??').map(([path]) => path)
-  const counts = await Promise.all(
-    fresh.map((path, i) => (i < MAX_COUNTED ? countFile($, `${root}/${path}`) : UNCOUNTED)),
-  )
-  const untracked = new Map(fresh.map((path, i): [string, Count] => [path, counts[i] ?? UNCOUNTED]))
-
-  return { isRepo: true, files: changesOf(root, parseNumstat(diff), codes, untracked) }
+  return { isRepo: true, files: changesOf(root, parseNumstat(diff), parseStatus(status)) }
 }
 
 let running: Promise<Snapshot> | null = null

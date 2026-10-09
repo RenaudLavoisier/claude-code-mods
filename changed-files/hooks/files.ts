@@ -2,14 +2,7 @@ import type { FileChange, FileKind } from '../types'
 
 export type Count = Pick<FileChange, 'added' | 'removed' | 'isBinary'>
 
-export const UNCOUNTED: Count = { added: null, removed: null, isBinary: false }
 export const BINARY: Count = { added: null, removed: null, isBinary: true }
-
-export function countLines(text: string): number {
-  if (text === '') return 0
-
-  return text.replace(/\n$/, '').split('\n').length
-}
 
 // `git diff --numstat -z --no-renames`: "added\tremoved\tpath\0" per file, "-\t-" for a binary one.
 export function parseNumstat(out: string): Map<string, Count> {
@@ -35,32 +28,21 @@ export function parseStatus(out: string): Map<string, string> {
 }
 
 export function kindOf(code: string | undefined): FileKind {
-  if (code === '??') return 'untracked'
   if (code?.[0] === 'A') return 'added'
   if (code?.includes('D')) return 'deleted'
 
   return 'modified'
 }
 
-// The files that differ from the base, then the untracked ones, sorted by path.
-export function changesOf(
-  root: string,
-  counts: Map<string, Count>,
-  codes: Map<string, string>,
-  untracked: Map<string, Count>,
-): FileChange[] {
-  const tracked = [...counts].map(([path, count]): FileChange => ({
-    path: `${root}/${path}`,
-    kind: kindOf(codes.get(path)),
-    ...count,
-  }))
-  const fresh = [...untracked].map(([path, count]): FileChange => ({
-    path: `${root}/${path}`,
-    kind: 'untracked',
-    ...count,
-  }))
-
-  return [...tracked, ...fresh].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
+// The files that differ from the base, sorted by path.
+export function changesOf(root: string, counts: Map<string, Count>, codes: Map<string, string>): FileChange[] {
+  return [...counts]
+    .map(([path, count]): FileChange => ({
+      path: `${root}/${path}`,
+      kind: kindOf(codes.get(path)),
+      ...count,
+    }))
+    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
 }
 
 export function relativeTo(cwd: string, path: string): string {

@@ -1,7 +1,7 @@
 {
   "name": "changed-files",
-  "version": "0.2.0",
-  "description": "A pane that lists the files that differ from HEAD, as git diff shows them",
+  "version": "0.3.0",
+  "description": "A pane that lists the files that differ from HEAD, as git diff shows them, untracked files left out",
   "author": {
     "name": "Renaud Lavoisier"
   },

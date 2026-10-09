@@ -1,7 +1,7 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
-import { changesOf, countLines, kindOf, parseNumstat, parseStatus, relativeTo } from '../hooks/files'
+import { changesOf, kindOf, parseNumstat, parseStatus, relativeTo } from '../hooks/files'
 
 const PANE = {
   component: 'Pane',
@@ -17,7 +17,7 @@ const PANE = {
 } as const
 
 const DIFF = '3\t1\tapp/x.py\0-\t-\timg.png\0' + '0\t4\told.py\0'
-const STATUS = ' M app/x.py\0M  img.png\0D  old.py\0?? notes.md\0'
+const STATUS = ' M app/x.py\0M  img.png\0D  old.py\0'
 
 // Answers git as a repository at /repo with the changes above would, and records each call.
 function git(on: On, repo: { isRepo?: boolean; diff?: string; status?: string } = {}) {
@@ -36,14 +36,11 @@ function git(on: On, repo: { isRepo?: boolean; diff?: string; status?: string } 
     return answer(1)
   })
   on('session.cwd', () => ({ value: '/repo' }))
-  on('fs.read', () => ({ value: 'a\nb\n' }))
 
   return calls
 }
 
 test('helpers', () => {
-  expect(countLines('')).toBe(0)
-  expect(countLines('a\nb\n')).toBe(2)
   expect(relativeTo('/repo', '/repo/app/x.py')).toBe('app/x.py')
   expect(kindOf('A ')).toBe('added')
   expect(kindOf(' D')).toBe('deleted')
@@ -53,20 +50,15 @@ test('helpers', () => {
   expect(counts.get('app/x.py')).toEqual({ added: 3, removed: 1, isBinary: false })
   expect(counts.get('img.png')).toEqual({ added: null, removed: null, isBinary: true })
 
-  const codes = parseStatus(STATUS)
-  expect(codes.get('notes.md')).toBe('??')
-
-  const untracked = new Map([['notes.md', { added: 2, removed: 0, isBinary: false }]])
-  expect(changesOf('/repo', counts, codes, untracked).map(file => [file.path, file.kind])).toEqual([
+  expect(changesOf('/repo', counts, parseStatus(STATUS)).map(file => [file.path, file.kind])).toEqual([
     ['/repo/app/x.py', 'modified'],
     ['/repo/img.png', 'modified'],
-    ['/repo/notes.md', 'untracked'],
     ['/repo/old.py', 'deleted'],
   ])
 })
 
 test('the pane lists what git diff shows, on every surface', async ($, on) => {
-  git(on)
+  const calls = git(on)
   on('tool.call', () => ({ result: {} }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
   mock.clock(on)
@@ -76,10 +68,11 @@ test('the pane lists what git diff shows, on every surface', async ($, on) => {
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'changed-files', surface, ...PANE })
     const rows = await ui.findAll({ type: 'Button' })
-    expect(rows.map(row => row.key)).toEqual(['/repo/app/x.py', '/repo/img.png', '/repo/notes.md', '/repo/old.py'])
-    expect(await ui.find({ type: 'Text', text: /4 files · \+5 -5/ })).toBeDefined()
+    expect(rows.map(row => row.key)).toEqual(['/repo/app/x.py', '/repo/img.png', '/repo/old.py'])
+    expect(await ui.find({ type: 'Text', text: /3 files · \+3 -5/ })).toBeDefined()
     await ui.unmount()
   }
+  expect(calls).toContain('status --porcelain=v1 -z --untracked-files=no --no-renames')
 })
 
 test('a tool that changes no file does not read git', async ($, on) => {

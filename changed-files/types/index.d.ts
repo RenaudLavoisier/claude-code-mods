@@ -1,8 +1,7 @@
-// How git sees a file against HEAD; untracked files are listed too.
-export type FileKind = 'modified' | 'added' | 'deleted' | 'untracked'
+// How git sees a file against HEAD; untracked files are not listed.
+export type FileKind = 'modified' | 'added' | 'deleted'
 
-// added and removed are null when the lines were not counted: a binary file, or an
-// untracked file too big to read or past the first ones counted.
+// added and removed are null for a binary file.
 export type FileChange = {
   path: string
   kind: FileKind

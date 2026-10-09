@@ -107,20 +107,19 @@ Done in 2m14s: The migration is ready and all tests pass.
 
 ## changed-files
 
-A side pane that lists the files that differ from `HEAD` in the session's git repository, as `git diff` and `git status` show them:
+A side pane that lists the tracked files that differ from `HEAD` in the session's git repository, as `git diff` and `git status` show them:
 
 ```text
 +12 -3 app/src/core/tasks.py
 +40 -0 app/tests/test_tasks.py added
 +0 -25 app/legacy.py deleted
-+8 -0 notes.md untracked
 bin logo.png
 
-5 files · +60 -28 · press a file to mention it
+4 files · +52 -28 · press a file to mention it
 ```
 
-- **What it lists:** the staged and unstaged changes against `HEAD` (`git diff HEAD`), and the untracked files that `.gitignore` does not exclude. The list shows every change in the repository, whoever made it: Claude, you in your editor, or a shell command.
-- **Counts:** `+N` lines added and `-N` lines removed, then `added`, `deleted` or `untracked` when the file is not only modified. `bin` marks a binary file, and `?` an untracked file that the mod did not count (over 4 MiB, or past the first 100 untracked files). Paths are relative to the session's directory.
+- **What it lists:** the staged and unstaged changes against `HEAD` (`git diff HEAD`). Untracked files are not listed: `git add` a new file to see it. The list shows every change in the repository, whoever made it: Claude, you in your editor, or a shell command.
+- **Counts:** `+N` lines added and `-N` lines removed, then `added` or `deleted` when the file is not only modified. `bin` marks a binary file. Paths are relative to the session's directory.
 - **Updates:** right after Claude runs `Edit`, `Write`, `NotebookEdit` or `Bash`, when you type `/changes`, and every 5 seconds while the pane is open. Git runs with `--no-optional-locks`, so these reads never block your own git commands.
 - **Opening:** the pane opens once per session, the first time Claude changes a file while the repository has changes, if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/changes`, which opens the pane at any width.
 - **Mention a file:** press a file to insert `@path` in the prompt.
