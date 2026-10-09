@@ -53,3 +53,15 @@ test('a refused edit is not listed', async ($, on) => {
   const ui = await $.ui.mount({ plugin: 'changed-files', surface: 'terminal', ...PANE })
   expect(await ui.find({ type: 'Text', text: /No file changed yet/ })).toBeDefined()
 })
+
+test('a narrow terminal points to /changes', async ($, on) => {
+  const toasts: string[] = []
+  on('tool.call', () => ({ result: {} }))
+  on('ui.open', () => ({ value: { isPlaced: false, reason: 'unasked below 144 columns (now 120)' } }))
+  on('ui.toast', ($, e) => (toasts.push(e.text), { value: undefined }))
+
+  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'a', new_string: 'b' })
+  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'b', new_string: 'c' })
+  expect(toasts).toHaveLength(1)
+  expect(toasts[0]).toMatch(/\/changes/)
+})

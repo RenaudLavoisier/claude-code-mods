@@ -1,6 +1,6 @@
 {
   "name": "changed-files",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A pane that lists the files Claude changed in this session",
   "author": {
     "name": "Renaud Lavoisier"

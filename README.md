@@ -118,7 +118,7 @@ A side pane that lists the files Claude changed in this session, last changed fi
 ```
 
 - **Counts:** `+N` lines added and `-N` lines removed, `new` for a file that Claude created, and `×n` for a file that Claude changed more than once. Paths are relative to the session's directory.
-- **Opening:** the pane opens on the first change if the terminal is wide enough. You can open it at any time with `/changes`.
+- **Opening:** the pane opens on the first change if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/changes`, which opens the pane at any width.
 - **Mention a file:** press a file to insert `@path` in the prompt.
 - **`/changes clear`:** empties the list.
 - **Limits:**

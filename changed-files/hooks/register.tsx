@@ -69,7 +69,13 @@ export const register: Register = on => {
     if (ran.deny === undefined && ran.isError !== true) {
       const list = await update($, files, list => record(list, change))
       if (list.length === 1 && list[0]?.edits === 1) {
-        void $.ui.open({ id: PANE, title: TITLE })
+        // Opened unasked, the pane waits undrawn below 144 columns: point to /changes.
+        const opened = await $.ui.open({ id: PANE, title: TITLE })
+        if (!opened.isPlaced) {
+          $.ui.toast('Terminal too narrow to open the pane: type /changes to see the changed files', {
+            timeoutMs: 10_000,
+          })
+        }
       }
     }
 
