@@ -1,0 +1,25 @@
+context-pet/tests/context-pet.test.tsx
+  s_764e4b159f560e::t_bea93abdb566ed 2-117
+context-pet/.claude-plugin/plugin.json
+  s_764e4b159f560e::t_3d06e5ee308a4a 3
+context-pet/hooks/register.tsx
+  s_764e4b159f560e::t_485d22840ca3c4 87-88,98-113,115
+README.md
+  s_764e4b159f560e::t_162ea84f509e7b 78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7a6909cb4d91113835928ba258c4901346909dcc",
+  "prompts": {},
+  "sessions": {
+    "s_764e4b159f560e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "59eda257-5914-4729-811f-e16ff9a888d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Renaud Lavoisier <renaud.lavoisier@lengow.com>"
+    }
+  }
+}
