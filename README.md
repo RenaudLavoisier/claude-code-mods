@@ -1,6 +1,6 @@
 # claude-code-mods
 
-Four mods for [Claude Code](https://claude.com/claude-code) that show what is happening in a session without getting in your way:
+Five mods for [Claude Code](https://claude.com/claude-code) that show what is happening in a session without getting in your way:
 
 | Mod | Where it shows | What it does |
 | --- | --- | --- |
@@ -8,8 +8,9 @@ Four mods for [Claude Code](https://claude.com/claude-code) that show what is ha
 | [**usage-meter**](#usage-meter) | Status line under the prompt | Your 5-hour and 7-day usage limits, with warnings at 80% and 95% |
 | [**turn-notify**](#turn-notify) | Desktop notification | Tells you when a turn of one minute or more is done |
 | [**changed-files**](#changed-files) | Side pane | The files that differ from HEAD, as `git diff` shows them, with added and removed lines |
+| [**pr-checks**](#pr-checks) | Side pane | The GitHub checks of the current branch's pull request: failed, running, passed |
 
-The mods work together: each one uses a different part of the screen. You can install all of them or only the ones you want.
+The mods work together: each one uses a different part of the screen, and the two panes show as tabs of the side pane. You can install all of them or only the ones you want.
 
 ## Installation
 
@@ -24,6 +25,7 @@ claude plugin install context-pet@claude-code-mods --scope user
 claude plugin install usage-meter@claude-code-mods --scope user
 claude plugin install turn-notify@claude-code-mods --scope user
 claude plugin install changed-files@claude-code-mods --scope user
+claude plugin install pr-checks@claude-code-mods --scope user
 ```
 
 With `--scope user`, the mods load in every Claude Code session. In a session that is already open, run `/reload-plugins` to load them.
@@ -124,6 +126,32 @@ bin logo.png
 - **Opening:** the pane opens once per session, the first time Claude changes a file while the repository has changes, if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/changes`, which opens the pane at any width.
 - **Mention a file:** press a file to insert `@path` in the prompt.
 - **Outside a git repository:** the pane says `Not in a git repository.`
+
+## pr-checks
+
+A side pane that shows the GitHub checks of the pull request of the current git branch:
+
+```text
+PR #3021
+feat(core): Log caller and force flags of task API launches
+✓ 14 ✗ 1 ● 2 ○ 2
+
+✗ Run linters
+● Run unit tests
+● Run functional tests
+✓ Run Sonarqube analysis
+…
+
+↻ refresh
+```
+
+- **Requirements:** the [GitHub CLI](https://cli.github.com/) (`gh`), logged in with `gh auth login`. The mod runs `git branch --show-current`, `gh pr view` and `gh pr checks`.
+- **What it lists:** every check, failed (`✗`) and cancelled (`⊘`) first, then running (`●`), passed (`✓`) and skipped (`○`). `PR #N` and each check name are links to GitHub.
+- **Updates:** when the session starts, at the end of each turn, and when you press `↻ refresh`. In between, every 30 seconds while a check runs or after you change branch, else every 2 minutes.
+- **Toast:** when the running checks are done, a toast says `PR #N: all checks passed` or `PR #N: N checks failed`.
+- **Opening:** the pane opens once per session, the first time the branch has a pull request, if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/pr-checks`, which opens the pane at any width.
+- **`/pr-checks`:** opens the pane and lists every check with its link in the conversation, so you can ask Claude to fix a failing one.
+- **No pull request:** the pane says `No pull request for branch <branch>.` If `gh` fails, the pane shows the error.
 
 ## Development
 

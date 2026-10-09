@@ -1,0 +1,10 @@
+{
+  "name": "pr-checks",
+  "version": "0.1.0",
+  "description": "A pane that shows the GitHub checks of the current branch's pull request",
+  "author": {
+    "name": "Renaud Lavoisier"
+  },
+  "repository": "https://github.com/RenaudLavoisier/claude-code-mods",
+  "types": "./types/index.d.ts"
+}

@@ -1,6 +1,6 @@
 {
   "name": "claude-code-mods",
-  "description": "Claude Code mods: Tokachu the context pet, a usage-limits meter, long-turn notifications and a changed-files pane",
+  "description": "Claude Code mods: Tokachu the context pet, a usage-limits meter, long-turn notifications, a changed-files pane and a PR checks pane",
   "owner": {
     "name": "Renaud Lavoisier"
   },
@@ -20,6 +20,10 @@
     {
       "name": "changed-files",
       "source": "./changed-files"
+    },
+    {
+      "name": "pr-checks",
+      "source": "./pr-checks"
     }
   ]
 }
