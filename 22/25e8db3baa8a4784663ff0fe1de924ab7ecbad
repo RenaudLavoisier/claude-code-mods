@@ -1,0 +1,29 @@
+changed-files/.claude-plugin/plugin.json
+  s_764e4b159f560e::t_df62d9eaf176ae 3-4
+changed-files/types/index.d.ts
+  s_764e4b159f560e::t_e12786db99795f 1-2,4
+changed-files/hooks/register.tsx
+  s_764e4b159f560e::t_49d6f1a36fbaf9 4,27,36,40
+changed-files/hooks/files.ts
+  s_764e4b159f560e::t_07fa8a99a51dad 37-45
+changed-files/tests/changed-files.test.ts
+  s_764e4b159f560e::t_d304b81e749f98 4,20,53,61,71-72,75
+README.md
+  s_764e4b159f560e::t_6a55d797ee240a 110,118,121-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2225e8db3baa8a4784663ff0fe1de924ab7ecbad",
+  "prompts": {},
+  "sessions": {
+    "s_764e4b159f560e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "59eda257-5914-4729-811f-e16ff9a888d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Renaud Lavoisier <renaud.lavoisier@lengow.com>"
+    }
+  }
+}
