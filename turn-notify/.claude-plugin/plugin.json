@@ -1,0 +1,9 @@
+{
+  "name": "turn-notify",
+  "version": "0.1.0",
+  "description": "Sends a native notification when a long turn ends",
+  "author": {
+    "name": "Renaud Lavoisier"
+  },
+  "repository": "https://github.com/RenaudLavoisier/claude-code-mods"
+}

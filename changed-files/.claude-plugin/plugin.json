@@ -1,0 +1,10 @@
+{
+  "name": "changed-files",
+  "version": "0.1.0",
+  "description": "A pane that lists the files Claude changed in this session",
+  "author": {
+    "name": "Renaud Lavoisier"
+  },
+  "repository": "https://github.com/RenaudLavoisier/claude-code-mods",
+  "types": "./types/index.d.ts"
+}

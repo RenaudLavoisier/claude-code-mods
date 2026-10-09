@@ -1,0 +1,25 @@
+{
+  "name": "claude-code-mods",
+  "description": "Claude Code mods: Tokachu the context pet, a usage-limits meter, long-turn notifications and a changed-files pane",
+  "owner": {
+    "name": "Renaud Lavoisier"
+  },
+  "plugins": [
+    {
+      "name": "context-pet",
+      "source": "./context-pet"
+    },
+    {
+      "name": "usage-meter",
+      "source": "./usage-meter"
+    },
+    {
+      "name": "turn-notify",
+      "source": "./turn-notify"
+    },
+    {
+      "name": "changed-files",
+      "source": "./changed-files"
+    }
+  ]
+}

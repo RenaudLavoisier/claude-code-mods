@@ -1,0 +1,10 @@
+{
+  "name": "usage-meter",
+  "version": "0.1.0",
+  "description": "Shows the 5-hour and 7-day usage limits in the status line and warns at 80% and 95%",
+  "author": {
+    "name": "Renaud Lavoisier"
+  },
+  "repository": "https://github.com/RenaudLavoisier/claude-code-mods",
+  "types": "./types/index.d.ts"
+}

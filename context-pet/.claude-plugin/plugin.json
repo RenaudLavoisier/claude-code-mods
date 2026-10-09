@@ -1,0 +1,10 @@
+{
+  "name": "context-pet",
+  "version": "0.1.0",
+  "description": "A pet above the prompt that grows and turns red as the context fills up",
+  "author": {
+    "name": "Renaud Lavoisier"
+  },
+  "repository": "https://github.com/RenaudLavoisier/claude-code-mods",
+  "types": "./types/index.d.ts"
+}
