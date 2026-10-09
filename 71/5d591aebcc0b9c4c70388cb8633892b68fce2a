@@ -1,0 +1,32 @@
+README.md
+  s_764e4b159f560e::t_dbf7176125d752 3,11,13,28,131-146
+  s_764e4b159f560e::t_5aff116e436eb0 147
+pr-checks/.claude-plugin/plugin.json
+  s_764e4b159f560e::t_4ac4ab34fd6d48 1-10
+pr-checks/hooks/register.tsx
+  s_764e4b159f560e::t_352cfd32ae0e68 1-239
+pr-checks/types/index.d.ts
+  s_764e4b159f560e::t_0276af8709ab55 1-24
+.claude-plugin/marketplace.json
+  s_764e4b159f560e::t_e2ee6e824a2f02 3,23-26
+pr-checks/tests/pr-checks.test.tsx
+  s_764e4b159f560e::t_012cefd579bf3e 1-166
+pr-checks/hooks/hooks.json
+  s_764e4b159f560e::t_8b2d36e0c3c3c6 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "715d591aebcc0b9c4c70388cb8633892b68fce2a",
+  "prompts": {},
+  "sessions": {
+    "s_764e4b159f560e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "59eda257-5914-4729-811f-e16ff9a888d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Renaud Lavoisier <renaud.lavoisier@lengow.com>"
+    }
+  }
+}
