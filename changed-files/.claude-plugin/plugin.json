@@ -1,7 +1,7 @@
 {
   "name": "changed-files",
-  "version": "0.1.1",
-  "description": "A pane that lists the files Claude changed in this session",
+  "version": "0.2.0",
+  "description": "A pane that lists the files that differ from HEAD, as git diff shows them",
   "author": {
     "name": "Renaud Lavoisier"
   },

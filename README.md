@@ -7,7 +7,7 @@ Four mods for [Claude Code](https://claude.com/claude-code) that show what is ha
 | [**Tokachu**](#tokachu-context-pet) (`context-pet`) | Band above the prompt | A pet that grows and turns from green to red as the context fills up |
 | [**usage-meter**](#usage-meter) | Status line under the prompt | Your 5-hour and 7-day usage limits, with warnings at 80% and 95% |
 | [**turn-notify**](#turn-notify) | Desktop notification | Tells you when a turn of one minute or more is done |
-| [**changed-files**](#changed-files) | Side pane | The files Claude changed in this session, with added and removed lines |
+| [**changed-files**](#changed-files) | Side pane | The files that differ from HEAD, as `git diff` shows them, with added and removed lines |
 
 The mods work together: each one uses a different part of the screen. You can install all of them or only the ones you want.
 
@@ -107,24 +107,24 @@ Done in 2m14s: The migration is ready and all tests pass.
 
 ## changed-files
 
-A side pane that lists the files Claude changed in this session, last changed first:
+A side pane that lists the files that differ from `HEAD` in the session's git repository, as `git diff` and `git status` show them:
 
 ```text
-+12 -3 app/src/core/tasks.py ×2
-+40 -0 app/tests/test_tasks.py new
-+1 -1 README.md
++12 -3 app/src/core/tasks.py
++40 -0 app/tests/test_tasks.py added
++0 -25 app/legacy.py deleted
++8 -0 notes.md untracked
+bin logo.png
 
-3 files · +53 -4 · press a file to mention it
+5 files · +60 -28 · press a file to mention it
 ```
 
-- **Counts:** `+N` lines added and `-N` lines removed, `new` for a file that Claude created, and `×n` for a file that Claude changed more than once. Paths are relative to the session's directory.
-- **Opening:** the pane opens on the first change if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/changes`, which opens the pane at any width.
+- **What it lists:** the staged and unstaged changes against `HEAD` (`git diff HEAD`), and the untracked files that `.gitignore` does not exclude. The list shows every change in the repository, whoever made it: Claude, you in your editor, or a shell command.
+- **Counts:** `+N` lines added and `-N` lines removed, then `added`, `deleted` or `untracked` when the file is not only modified. `bin` marks a binary file, and `?` an untracked file that the mod did not count (over 4 MiB, or past the first 100 untracked files). Paths are relative to the session's directory.
+- **Updates:** right after Claude runs `Edit`, `Write`, `NotebookEdit` or `Bash`, when you type `/changes`, and every 5 seconds while the pane is open. Git runs with `--no-optional-locks`, so these reads never block your own git commands.
+- **Opening:** the pane opens once per session, the first time Claude changes a file while the repository has changes, if the terminal is 144 columns wide or more. In a narrower terminal, a message tells you to type `/changes`, which opens the pane at any width.
 - **Mention a file:** press a file to insert `@path` in the prompt.
-- **`/changes clear`:** empties the list.
-- **Limits:**
-  - The mod tracks the `Edit`, `Write` and `NotebookEdit` tools only. It does not see files that a shell command changes (`sed`, `git checkout`, a formatter, ...).
-  - For `Edit`, the counts are an estimate: the lines of the replaced text and of the new text, not a real diff.
-  - When a tool call fails or you deny it, the file is not added.
+- **Outside a git repository:** the pane says `Not in a git repository.`
 
 ## Development
 

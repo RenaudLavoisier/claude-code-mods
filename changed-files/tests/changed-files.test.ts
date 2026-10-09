@@ -1,6 +1,7 @@
-import { expect, test } from 'claude-code/testing'
+import { expect, mock, test } from 'claude-code/testing'
+import type { On } from 'claude-code'
 
-import { countLines, record, relativeTo } from '../hooks/files'
+import { changesOf, countLines, kindOf, parseNumstat, parseStatus, relativeTo } from '../hooks/files'
 
 const PANE = {
   component: 'Pane',
@@ -15,53 +16,126 @@ const PANE = {
   },
 } as const
 
+const DIFF = '3\t1\tapp/x.py\0-\t-\timg.png\0' + '0\t4\told.py\0'
+const STATUS = ' M app/x.py\0M  img.png\0D  old.py\0?? notes.md\0'
+
+// Answers git as a repository at /repo with the changes above would, and records each call.
+function git(on: On, repo: { isRepo?: boolean; diff?: string; status?: string } = {}) {
+  const calls: string[] = []
+  on('process.run', ($, e) => {
+    const args = e.argv.slice(2).join(' ')
+    calls.push(args)
+    const answer = (exitCode: number, stdout = '') => ({
+      value: { exitCode, stdout, stderr: '', isStdoutTruncated: false, isStderrTruncated: false },
+    })
+    if (args === 'rev-parse --show-toplevel') return repo.isRepo === false ? answer(128) : answer(0, '/repo\n')
+    if (args.startsWith('rev-parse --verify')) return answer(0, 'abc\n')
+    if (args.startsWith('diff HEAD')) return answer(0, repo.diff ?? DIFF)
+    if (args.startsWith('status')) return answer(0, repo.status ?? STATUS)
+
+    return answer(1)
+  })
+  on('session.cwd', () => ({ value: '/repo' }))
+  on('fs.read', () => ({ value: 'a\nb\n' }))
+
+  return calls
+}
+
 test('helpers', () => {
   expect(countLines('')).toBe(0)
   expect(countLines('a\nb\n')).toBe(2)
   expect(relativeTo('/repo', '/repo/app/x.py')).toBe('app/x.py')
+  expect(kindOf('A ')).toBe('added')
+  expect(kindOf(' D')).toBe('deleted')
+  expect(kindOf('MM')).toBe('modified')
 
-  const once = record([], { path: '/a', added: 2, removed: 1, isNew: false })
-  const twice = record(once, { path: '/a', added: 1, removed: 0, isNew: false })
-  expect(twice).toEqual([{ path: '/a', added: 3, removed: 1, isNew: false, edits: 2 }])
+  const counts = parseNumstat(DIFF)
+  expect(counts.get('app/x.py')).toEqual({ added: 3, removed: 1, isBinary: false })
+  expect(counts.get('img.png')).toEqual({ added: null, removed: null, isBinary: true })
+
+  const codes = parseStatus(STATUS)
+  expect(codes.get('notes.md')).toBe('??')
+
+  const untracked = new Map([['notes.md', { added: 2, removed: 0, isBinary: false }]])
+  expect(changesOf('/repo', counts, codes, untracked).map(file => [file.path, file.kind])).toEqual([
+    ['/repo/app/x.py', 'modified'],
+    ['/repo/img.png', 'modified'],
+    ['/repo/notes.md', 'untracked'],
+    ['/repo/old.py', 'deleted'],
+  ])
 })
 
-test('edits fill the pane on every surface', async ($, on) => {
+test('the pane lists what git diff shows, on every surface', async ($, on) => {
+  git(on)
   on('tool.call', () => ({ result: {} }))
-  on('session.cwd', () => ({ value: '/repo' }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
-  on('fs.read', () => ({ value: 'one\ntwo\n' }))
+  mock.clock(on)
 
-  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'a', new_string: 'b\nc' })
-  await $.tool.call({ tool: 'Write', file_path: '/repo/app/y.py', content: 'x\ny\nz\n' })
-  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'q', new_string: 'r' })
-  await $.tool.call({ tool: 'Read', file_path: '/repo/app/z.py' })
+  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'a', new_string: 'b' })
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'changed-files', surface, ...PANE })
     const rows = await ui.findAll({ type: 'Button' })
-    expect(rows.map(row => row.key)).toEqual(['/repo/app/x.py', '/repo/app/y.py'])
-    expect(await ui.find({ type: 'Text', text: /2 files · \+6 -4/ })).toBeDefined()
+    expect(rows.map(row => row.key)).toEqual(['/repo/app/x.py', '/repo/img.png', '/repo/notes.md', '/repo/old.py'])
+    expect(await ui.find({ type: 'Text', text: /4 files · \+5 -5/ })).toBeDefined()
     await ui.unmount()
   }
 })
 
-test('a refused edit is not listed', async ($, on) => {
-  on('tool.call', () => ({ deny: 'no' }))
-  on('session.cwd', () => ({ value: '/repo' }))
+test('a tool that changes no file does not read git', async ($, on) => {
+  const calls = git(on)
+  on('tool.call', () => ({ result: {} }))
 
-  await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'a', new_string: 'b' })
-  const ui = await $.ui.mount({ plugin: 'changed-files', surface: 'terminal', ...PANE })
-  expect(await ui.find({ type: 'Text', text: /No file changed yet/ })).toBeDefined()
+  await $.tool.call({ tool: 'Read', file_path: '/repo/app/x.py' })
+  expect(calls).toHaveLength(0)
 })
 
-test('a narrow terminal points to /changes', async ($, on) => {
+test('outside a git repository the pane says so', async ($, on) => {
+  git(on, { isRepo: false })
+  on('tool.call', () => ({ result: {} }))
+
+  await $.tool.call({ tool: 'Bash', command: 'ls' })
+  const ui = await $.ui.mount({ plugin: 'changed-files', surface: 'terminal', ...PANE })
+  expect(await ui.find({ type: 'Text', text: /Not in a git repository/ })).toBeDefined()
+})
+
+test('a narrow terminal points to /changes, once', async ($, on) => {
   const toasts: string[] = []
+  git(on)
   on('tool.call', () => ({ result: {} }))
   on('ui.open', () => ({ value: { isPlaced: false, reason: 'unasked below 144 columns (now 120)' } }))
   on('ui.toast', ($, e) => (toasts.push(e.text), { value: undefined }))
+  mock.clock(on)
 
   await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'a', new_string: 'b' })
   await $.tool.call({ tool: 'Edit', file_path: '/repo/app/x.py', old_string: 'b', new_string: 'c' })
   expect(toasts).toHaveLength(1)
   expect(toasts[0]).toMatch(/\/changes/)
+})
+
+test('while open, the pane follows changes made outside the session', async ($, on) => {
+  let diff = DIFF
+  const calls: string[] = []
+  on('process.run', ($, e) => {
+    const args = e.argv.slice(2).join(' ')
+    calls.push(args)
+    const stdout = args.startsWith('rev-parse --show') ? '/repo\n' : args.startsWith('diff') ? diff : args.startsWith('status') ? '' : 'abc\n'
+
+    return { value: { exitCode: 0, stdout, stderr: '', isStdoutTruncated: false, isStderrTruncated: false } }
+  })
+  on('session.cwd', () => ({ value: '/repo' }))
+  on('ui.open', () => ({ value: { isPlaced: true } }))
+  const clock = mock.clock(on)
+
+  await $.command.run({
+    command: 'changes',
+    args: '',
+    origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 },
+  })
+  diff = ''
+  await clock.advance(5_000)
+
+  const ui = await $.ui.mount({ plugin: 'changed-files', surface: 'terminal', ...PANE })
+  expect(await ui.find({ type: 'Text', text: /No change against HEAD/ })).toBeDefined()
 })
