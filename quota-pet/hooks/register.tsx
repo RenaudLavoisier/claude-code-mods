@@ -88,7 +88,7 @@ export const register: Register = on => {
 
     return (
       <Box flexDirection="row" flexWrap="wrap" alignItems="center">
-        <Box key="quotachu" flexDirection="row" alignItems="center" marginRight={4}>
+        <Box key="quotachu" flexDirection="row" alignItems="center" marginRight={4} marginTop={1}>
           <Box key="pet" flexDirection="column">
             {lines.map(line => (
               <Text color={color}>{line}</Text>
