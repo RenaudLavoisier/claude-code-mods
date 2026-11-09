@@ -1,6 +1,6 @@
 {
   "name": "context-pet",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A pet above the prompt that grows and turns red as the context fills up",
   "author": {
     "name": "Renaud Lavoisier"

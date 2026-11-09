@@ -21,6 +21,9 @@ const PET = {
   presentation: { isFullscreen: true, columns: 160 },
 } as const
 
+// Stands for what the band holds beneath the plugin: the engine's band, or another mod's.
+const beneath = (text: string) => () => ({ type: 'Text' as const, children: [text] })
+
 const measure = (percent: number) => ({
   context: { percent, tokens: percent * 2000, window: 200_000 },
   rateLimits: [],
@@ -38,6 +41,7 @@ test('pet starts small and green, then grows and turns red', () => {
 })
 
 test('band follows the context fill on every surface', async ($, on) => {
+  on('ui.render', beneath(''))
   on('session.measure', ($, e) => ({ changed: e.changed }))
 
   for (const surface of ['terminal', 'desktop'] as const) {
@@ -66,6 +70,22 @@ test('/pet hides and shows the pet', async ($, on) => {
   expect(shown?.text).toMatch(/back/)
 })
 
+test('band keeps what another mod draws beneath it', async ($, on) => {
+  on('ui.render', beneath('Quotachu'))
+  on('session.measure', ($, e) => ({ changed: e.changed }))
+  on('command.run', () => ({ text: 'engine' }))
+  await $.session.measure(measure(30))
+
+  const ui = await $.ui.mount({ plugin: 'context-pet', surface: 'terminal', ...BAND })
+  expect(await ui.find({ type: 'Text', text: /30% of context/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Quotachu' })).toBeDefined()
+
+  await $.command.run(PET)
+  expect(await ui.find({ type: 'Text', text: /of context/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'Quotachu' })).toBeDefined()
+  await ui.unmount()
+})
+
 const STEP = { turnId: 't1', index: 0, model: 'claude-opus-5-5', messageCount: 3 }
 
 const stepUsing = (input: number) => async function* () {
@@ -86,6 +106,7 @@ const stepUsing = (input: number) => async function* () {
 }
 
 test('pet grows after each model response of the turn', async ($, on) => {
+  on('ui.render', beneath(''))
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200_000 }, rateLimits: [] } }))
   on('turn.step', stepUsing(120_000))
 
@@ -100,6 +121,7 @@ test('pet grows after each model response of the turn', async ($, on) => {
 })
 
 test('a subagent step leaves the pet alone', async ($, on) => {
+  on('ui.render', beneath(''))
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200_000 }, rateLimits: [] } }))
   on('turn.step', stepUsing(180_000))
   on('session.measure', ($, e) => ({ changed: e.changed }))
