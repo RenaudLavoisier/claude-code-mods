@@ -91,7 +91,7 @@ test('band shows the 5h pet and the 7d line beside what lies beneath', async ($,
   })
 
   for (const surface of ['terminal', 'desktop'] as const) {
-    const ui = await $.ui.mount({ plugin: 'quotachu', surface, ...BAND })
+    const ui = await $.ui.mount({ plugin: 'quota-pet', surface, ...BAND })
     expect(await ui.find({ type: 'Text', text: /Quotachu · 5h 70% left/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '5h 30% used / 40% of window · resets in 3h00' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '7d 41% used / 70% of window · resets in 2d2h' })).toBeDefined()
@@ -106,7 +106,7 @@ test('without usage limits only what lies beneath is drawn', async ($, on) => {
   on('session.measure', ($, e) => ({ changed: e.changed }))
   await $.session.measure({ context: { window: 200_000 }, rateLimits: [], changed: ['rateLimits'] })
 
-  const ui = await $.ui.mount({ plugin: 'quotachu', surface: 'terminal', ...BAND })
+  const ui = await $.ui.mount({ plugin: 'quota-pet', surface: 'terminal', ...BAND })
   expect(await ui.find({ type: 'Text', text: /Quotachu/ })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: 'Tokachu' })).toBeDefined()
   await ui.unmount()
@@ -146,7 +146,7 @@ test('/quotapet hides and shows the pet', async ($, on) => {
     changed: ['rateLimits'],
   })
 
-  const ui = await $.ui.mount({ plugin: 'quotachu', surface: 'terminal', ...BAND })
+  const ui = await $.ui.mount({ plugin: 'quota-pet', surface: 'terminal', ...BAND })
   expect((await $.command.run(QUOTAPET))?.text).toMatch(/nap/)
   expect(await ui.find({ type: 'Text', text: /Quotachu/ })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: 'Tokachu' })).toBeDefined()

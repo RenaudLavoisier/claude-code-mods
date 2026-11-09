@@ -10,8 +10,8 @@
       "source": "./context-pet"
     },
     {
-      "name": "quotachu",
-      "source": "./quotachu"
+      "name": "quota-pet",
+      "source": "./quota-pet"
     },
     {
       "name": "usage-meter",

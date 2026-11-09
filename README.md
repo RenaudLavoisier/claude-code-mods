@@ -5,7 +5,7 @@ Six mods for [Claude Code](https://claude.com/claude-code) that show what is hap
 | Mod | Where it shows | What it does |
 | --- | --- | --- |
 | [**Tokachu**](#tokachu-context-pet) (`context-pet`) | Band above the prompt | A pet that grows and turns from green to red as the context fills up |
-| [**Quotachu**](#quotachu-usage-limit-pet) (`quotachu`) | Band above the prompt | A pet that shrinks as you use your 5-hour limit and turns red when you use it faster than time goes by |
+| [**Quotachu**](#quotachu-usage-limit-pet) (`quota-pet`) | Band above the prompt | A pet that shrinks as you use your 5-hour limit and turns red when you use it faster than time goes by |
 | [**usage-meter**](#usage-meter) | Status line under the prompt | Your 5-hour and 7-day usage limits, with warnings at 80% and 95% |
 | [**turn-notify**](#turn-notify) | Desktop notification | Tells you when a turn of one minute or more is done |
 | [**changed-files**](#changed-files) | Side pane | The files that differ from HEAD, as `git diff` shows them, with added and removed lines |
@@ -23,7 +23,7 @@ Add the marketplace, then install the mods you want:
 claude plugin marketplace add RenaudLavoisier/claude-code-mods
 
 claude plugin install context-pet@claude-code-mods --scope user
-claude plugin install quotachu@claude-code-mods --scope user
+claude plugin install quota-pet@claude-code-mods --scope user
 claude plugin install usage-meter@claude-code-mods --scope user
 claude plugin install turn-notify@claude-code-mods --scope user
 claude plugin install changed-files@claude-code-mods --scope user

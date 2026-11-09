@@ -14,9 +14,9 @@ import {
   windowLine,
 } from './quota'
 
-const windows = atom({ plugin: 'quotachu', key: 'windows' } as const, [])
-const isHidden = atom({ plugin: 'quotachu', key: 'isHidden' } as const, false)
-const wasStarving = atom({ plugin: 'quotachu', key: 'wasStarving' } as const, false)
+const windows = atom({ plugin: 'quota-pet', key: 'windows' } as const, [])
+const isHidden = atom({ plugin: 'quota-pet', key: 'isHidden' } as const, false)
+const wasStarving = atom({ plugin: 'quota-pet', key: 'wasStarving' } as const, false)
 
 const fiveHourOf = (list: readonly QuotaWindow[]) => list.find(w => w.kind === 'five_hour')
 
