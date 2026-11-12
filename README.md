@@ -1,10 +1,11 @@
 # claude-code-mods
 
-Five mods for [Claude Code](https://claude.com/claude-code) that show what is happening in a session without getting in your way:
+Six mods for [Claude Code](https://claude.com/claude-code) that show what is happening in a session without getting in your way:
 
 | Mod | Where it shows | What it does |
 | --- | --- | --- |
 | [**Tokachu**](#tokachu-context-pet) (`context-pet`) | Band above the prompt | A pet that grows and turns from green to red as the context fills up |
+| [**Quotachu**](#quotachu-usage-limit-pet) (`quota-pet`) | Band above the prompt | A pet that shrinks as you use your 5-hour limit and turns red when you use it faster than time goes by |
 | [**usage-meter**](#usage-meter) | Status line under the prompt | Your 5-hour and 7-day usage limits, with warnings at 80% and 95% |
 | [**turn-notify**](#turn-notify) | Desktop notification | Tells you when a turn of one minute or more is done |
 | [**changed-files**](#changed-files) | Side pane | The files that differ from HEAD, as `git diff` shows them, with added and removed lines |
@@ -22,6 +23,7 @@ Add the marketplace, then install the mods you want:
 claude plugin marketplace add RenaudLavoisier/claude-code-mods
 
 claude plugin install context-pet@claude-code-mods --scope user
+claude plugin install quota-pet@claude-code-mods --scope user
 claude plugin install usage-meter@claude-code-mods --scope user
 claude plugin install turn-notify@claude-code-mods --scope user
 claude plugin install changed-files@claude-code-mods --scope user
@@ -77,6 +79,44 @@ Tokachu lives above the prompt and eats your context. The more of the context wi
 - **Alert:** when the context goes past 80%, a toast says `Tokachu ate too much: N% of context`.
 - **`/clear`:** Tokachu goes back to its small, green size.
 - **`/pet`:** hides or shows Tokachu (`Tokachu is taking a nap.` / `Tokachu is back.`).
+- **Other mods in the band:** Tokachu keeps what another mod draws in the band and shows it on its right, or under it when the band is too narrow.
+
+## Quotachu (usage-limit pet)
+
+Quotachu lives above the prompt and eats your 5-hour usage limit. It starts big and gets smaller as you use the limit. Its color says whether you use the limit faster than the window's time goes by.
+
+```text
+ (\_________/)    Quotachu · 5h 97% left
+(     ^w^     )   5h 3% used / 4% of window · resets in 4h48
+(             )   7d 41% used / 70% of window · resets in 2d2h
+(             )   plenty of snacks
+ \___________/
+
+ (\___/)   Quotachu · 5h 12% left
+(  >_<  )  5h 88% used / 61% of window · resets in 1h57
+ \_____/   7d 63% used / 80% of window · resets in 1d9h
+           starving, empty in ~25m
+```
+
+- **Size:** the body shrinks from 13 to 5 cells wide and from 2 rows of belly to none as the 5-hour limit goes from 0% to 100% used. It never takes more rows than the space above the prompt allows.
+- **Pace:** the share of the limit used, against the share of the 5-hour window already gone. `30% used / 40% of window` is on pace.
+- **Color:** green when the usage is at or behind the pace, yellow at 10 points ahead, red at 20 points ahead or more. These are the colors and gradient of Tokachu. Without a reset time, the share used drives the color.
+- **Face and mood:**
+
+  | 5-hour limit | Face | Mood |
+  | --- | --- | --- |
+  | At or behind the pace | `^w^` | plenty of snacks |
+  | Up to 10 points ahead | `o_o` | nibbling fast |
+  | More than 10 points ahead | `>_<` | starving, empty in ~N (when the limit runs out before the reset at the current rate) |
+  | 100% used | `x_x` | out of snacks, back in N |
+
+  While Claude works, the mood line shows `munch munch…`.
+- **7-day limit:** one text line under the 5-hour one, when Claude Code reports it.
+- **Updates:** when Claude Code measures the usage limits, and every minute, since the pace changes with time.
+- **Alert:** when the 5-hour limit turns red, a toast says, for example, `Quotachu is starving: 5h limit at 80%, resets in 3h00`. It fires again only after the limit goes back to yellow or green.
+- **No usage limits:** on a plan without usage limits, or until the first API response of the session, Quotachu draws nothing.
+- **With Tokachu:** both pets share the band, side by side, or one under the other when the band is too narrow.
+- **`/quotapet`:** hides or shows Quotachu (`Quotachu is taking a nap.` / `Quotachu is back.`).
 
 ## usage-meter
 

@@ -78,9 +78,13 @@ export const register: Register = on => {
     return { text: hidden ? `${NAME} is taking a nap.` : `${NAME} is back.` }
   })
 
+  // Draws beside whatever the band holds beneath (another mod's band, for one),
+  // so several mods share the band; a narrow band wraps them.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    const beneath = await next(e)
+
     if (e.props.hasSurvey || (await read($, isHidden))) {
-      return next(e)
+      return beneath
     }
 
     const { Box, Text } = $.ui.resolve(e)
@@ -93,21 +97,24 @@ export const register: Register = on => {
       : 'has not eaten anything yet'
 
     return (
-      <Box flexDirection="row" alignItems="center">
-        <Box key="pet" flexDirection="column">
-          {lines.map(line => (
-            <Text color={color}>{line}</Text>
-          ))}
+      <Box flexDirection="row" flexWrap="wrap" alignItems="center">
+        <Box key="tokachu" flexDirection="row" alignItems="center" marginRight={4} marginTop={1}>
+          <Box key="pet" flexDirection="column">
+            {lines.map(line => (
+              <Text color={color}>{line}</Text>
+            ))}
+          </Box>
+          <Box key="stats" flexDirection="column" marginLeft={2}>
+            <Text color={color} bold>
+              {NAME} · {percent}% of context
+            </Text>
+            <Text dimColor>{detail}</Text>
+            <Text dimColor italic>
+              {e.props.isWorking ? 'nom nom…' : petMood(percent)}
+            </Text>
+          </Box>
         </Box>
-        <Box key="stats" flexDirection="column" marginLeft={2}>
-          <Text color={color} bold>
-            {NAME} · {percent}% of context
-          </Text>
-          <Text dimColor>{detail}</Text>
-          <Text dimColor italic>
-            {e.props.isWorking ? 'nom nom…' : petMood(percent)}
-          </Text>
-        </Box>
+        {beneath}
       </Box>
     )
   })

@@ -1,6 +1,6 @@
 {
   "name": "claude-code-mods",
-  "description": "Claude Code mods: Tokachu the context pet, a usage-limits meter, long-turn notifications, a changed-files pane and a PR checks pane",
+  "description": "Claude Code mods: Tokachu the context pet, Quotachu the usage-limit pet, a usage-limits meter, long-turn notifications, a changed-files pane and a PR checks pane",
   "owner": {
     "name": "Renaud Lavoisier"
   },
@@ -8,6 +8,10 @@
     {
       "name": "context-pet",
       "source": "./context-pet"
+    },
+    {
+      "name": "quota-pet",
+      "source": "./quota-pet"
     },
     {
       "name": "usage-meter",
