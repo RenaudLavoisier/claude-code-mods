@@ -18,6 +18,10 @@ const windows = atom({ plugin: 'quota-pet', key: 'windows' } as const, [])
 const isHidden = atom({ plugin: 'quota-pet', key: 'isHidden' } as const, false)
 const wasStarving = atom({ plugin: 'quota-pet', key: 'wasStarving' } as const, false)
 
+// The pets of this repository that draw in the band above the prompt.
+const BAND_PETS: readonly string[] = ['context-pet', 'quota-pet']
+const isBandPet = (plugin: string | undefined) => plugin !== undefined && BAND_PETS.includes(plugin)
+
 const fiveHourOf = (list: readonly QuotaWindow[]) => list.find(w => w.kind === 'five_hour')
 
 async function remember($: EngineInterface, limits: readonly SessionRateLimit[]) {
@@ -68,14 +72,22 @@ export const register: Register = on => {
     return { text: hidden ? `${NAME} is taking a nap.` : `${NAME} is back.` }
   })
 
-  // Draws beside whatever the band holds beneath (Tokachu, for one), so the
-  // pets share the band in either load order; a narrow band wraps them.
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+  // Claude Code asks the band for one row per plugin and stacks the rows. So
+  // each pet draws itself into the row of every band pet, beside what that row
+  // holds beneath, and the AbovePromptList hook below keeps the first of those
+  // rows only: the pets share one row in either load order, and a narrow band
+  // wraps them.
+  on('ui.render', { component: 'AbovePrompt', plugin: '*' }, async ($, e, next) => {
     const beneath = await next(e)
     const list = await read($, windows)
     const fiveHour = fiveHourOf(list)
 
-    if (e.props.hasSurvey || fiveHour === undefined || (await read($, isHidden))) {
+    if (
+      !isBandPet(e.plugin) ||
+      e.props.hasSurvey ||
+      fiveHour === undefined ||
+      (await read($, isHidden))
+    ) {
       return beneath
     }
 
@@ -108,5 +120,13 @@ export const register: Register = on => {
         {beneath}
       </Box>
     )
+  })
+
+  // Every band pet's row holds all the pets, so keep the first of those rows.
+  on('ui.render', { component: 'AbovePromptList' }, async ($, e, next) => {
+    const first = e.props.rows.findIndex(row => isBandPet(row.plugin))
+    const rows = e.props.rows.filter((row, index) => index === first || !isBandPet(row.plugin))
+
+    return next({ ...e, props: { ...e.props, rows } })
   })
 }

@@ -6,6 +6,7 @@ const BAND = {
   component: 'AbovePrompt',
   props: {
     hasSurvey: false,
+    isCollapsed: false,
     isWorking: false,
     maxRows: 20,
     bodyColumns: 100,
@@ -134,4 +135,28 @@ test('a subagent step leaves the pet alone', async ($, on) => {
 
   expect(await ui.find({ type: 'Text', text: /· 10% of context/ })).toBeDefined()
   await ui.unmount()
+})
+
+// One plugin's settled band row, as Claude Code hands it to AbovePromptList.
+const row = (plugin: string, text: string) => ({
+  plugin,
+  tree: { type: 'Text' as const, children: [text] },
+})
+
+test('band keeps the first pet row only, and the rows of other mods', async ($) => {
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({
+      plugin: 'context-pet',
+      surface,
+      component: 'AbovePromptList',
+      props: {
+        ...BAND.props,
+        rows: [row('other-mod', 'Other'), row('quota-pet', 'Pets, first'), row('context-pet', 'Pets, again')],
+      },
+    })
+    expect(await ui.find({ type: 'Text', text: 'Other' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Pets, first' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Pets, again' })).toBeUndefined()
+    await ui.unmount()
+  }
 })

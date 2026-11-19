@@ -16,6 +16,7 @@ const BAND = {
   component: 'AbovePrompt',
   props: {
     hasSurvey: false,
+    isCollapsed: false,
     isWorking: false,
     maxRows: 20,
     bodyColumns: 140,
@@ -154,4 +155,28 @@ test('/quotapet hides and shows the pet', async ($, on) => {
   expect((await $.command.run(QUOTAPET))?.text).toMatch(/back/)
   expect(await ui.find({ type: 'Text', text: /Quotachu/ })).toBeDefined()
   await ui.unmount()
+})
+
+// One plugin's settled band row, as Claude Code hands it to AbovePromptList.
+const row = (plugin: string, text: string) => ({
+  plugin,
+  tree: { type: 'Text' as const, children: [text] },
+})
+
+test('band keeps the first pet row only, and the rows of other mods', async ($) => {
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({
+      plugin: 'quota-pet',
+      surface,
+      component: 'AbovePromptList',
+      props: {
+        ...BAND.props,
+        rows: [row('other-mod', 'Other'), row('context-pet', 'Pets, first'), row('quota-pet', 'Pets, again')],
+      },
+    })
+    expect(await ui.find({ type: 'Text', text: 'Other' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Pets, first' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: 'Pets, again' })).toBeUndefined()
+    await ui.unmount()
+  }
 })

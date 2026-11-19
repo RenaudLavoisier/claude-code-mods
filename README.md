@@ -15,7 +15,7 @@ The mods work together: each one uses a different part of the screen, and the tw
 
 ## Installation
 
-You need a Claude Code version that supports mods (plugins with function hooks). The mods are tested with Claude Code 2.1.295.
+You need a Claude Code version that supports mods (plugins with function hooks). The mods are tested with Claude Code 2.1.295, and Tokachu and Quotachu with 2.1.327.
 
 Add the marketplace, then install the mods you want:
 
@@ -79,7 +79,7 @@ Tokachu lives above the prompt and eats your context. The more of the context wi
 - **Alert:** when the context goes past 80%, a toast says `Tokachu ate too much: N% of context`.
 - **`/clear`:** Tokachu goes back to its small, green size.
 - **`/pet`:** hides or shows Tokachu (`Tokachu is taking a nap.` / `Tokachu is back.`).
-- **Other mods in the band:** Tokachu keeps what another mod draws in the band and shows it on its right, or under it when the band is too narrow.
+- **With Quotachu:** both pets share one row of the band, side by side, or one under the other when the band is too narrow. Other mods keep their own rows.
 
 ## Quotachu (usage-limit pet)
 
